@@ -19,7 +19,7 @@ class ChromeBrowser(Browser):
   def _set_chrome_options(self) -> webdriver.ChromeOptions:
     options = webdriver.ChromeOptions()
     options.add_argument("user-data-dir=./.user_profile_data")
-    # options.add_argument("--headless")
+    options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-extensions")
     options.add_argument("--disable-gpu")

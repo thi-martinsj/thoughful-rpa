@@ -100,7 +100,7 @@ class ChromeBrowser(Browser):
     try:
       strategy, locator = self._get_strategy_and_locator(selector)
       return element.find_element(strategy, locator)
-    except:
+    except Exception:
       return None
 
   def get_child_elements(self, element: WebElement, selector: str) -> list[WebElement]:

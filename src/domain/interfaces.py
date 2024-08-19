@@ -40,5 +40,8 @@ class Browser(ABC):
 
 
 class NewsRepository(ABC):
-  def fetch_news(self) -> None:
+  def fetch_news(self, phrase: str, category: str, number_months: int) -> list[dict]:
+    raise NotImplementedError
+
+  def download_image(self, url: str, filename: str) -> None:
     raise NotImplementedError

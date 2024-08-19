@@ -1,17 +1,17 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
+from RPA.HTTP import HTTP
+
 from src.domain.enums import APNewsCategory
 from src.domain.interfaces import Browser, NewsRepository
-
-from time import sleep
 
 
 class APNewsRepository(NewsRepository):
   def __init__(self, browser: Browser) -> None:
     self._browser = browser
 
-  def fecth_news(self, phrase: str, category: str, number_months: int) -> list[dict]:
+  def fetch_news(self, phrase: str, category: str, number_months: int) -> list[dict]:
     news_data = []
     self._browser.goto("https://apnews.com/")
     self._search_news(phrase)
@@ -19,6 +19,10 @@ class APNewsRepository(NewsRepository):
     self._extract_data_from_news(number_months, news_data)
     self._browser.close()
     return news_data
+
+  def download_image(self, url: str, filename: str) -> None:
+    http = HTTP()
+    http.download(url=url, overwrite=True, target_file=f"./output/news_picture/{filename}.jpg")
 
   def _search_news(self, phrase: str):
     self._browser.click(".SearchOverlay-search-button")
@@ -30,7 +34,7 @@ class APNewsRepository(NewsRepository):
 
     self._browser.select(".Select-input", "3")
 
-    self._browser.wait_to_be_visible(".SearchFilter-heading", 5)
+    self._browser.wait_to_be_visible(".SearchFilter-heading", 10)
 
     if category == APNewsCategory.LIVE_BLOGS.value:
       self._browser.click("input_value=00000190-0dc5-d7b0-a1fa-dde7ec030000")

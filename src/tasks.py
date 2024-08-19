@@ -1,11 +1,12 @@
 from robocorp.tasks import task
 
+from .application.news_scrapper import NewsScraper
 from .infrastructure.browsers.chrome_browser import ChromeBrowser
 from .infrastructure.repositories.ap_news_repository import APNewsRepository
 
 
 @task
 def minimal_task():
-    ap_news_repo = APNewsRepository(ChromeBrowser())
-    ap_news_repo.fecth_news("test", "stories", 2)
-
+    scrapper = NewsScraper(APNewsRepository(ChromeBrowser()))
+    news = scrapper.get_news("dollars", "stories", 2)
+    scrapper.download_images(news)

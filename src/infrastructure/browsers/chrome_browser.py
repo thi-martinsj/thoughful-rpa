@@ -59,51 +59,101 @@ class ChromeBrowser(Browser):
     self._driver.quit()
 
   def click(self, selector: str) -> None:
-    strategy, locator = self._get_strategy_and_locator(selector)
+    element = self.get_element(selector)
 
-    self._driver.find_element(strategy, locator).click()
+    if not element:
+      return
+
+    self._logger.info(f"Clicking on the element '{element.tag_name}' by selector '{selector}'")
+    try:
+      element.click()
+    except Exception as e:
+      self._logger.exception(
+        f"Error when clicking on the element '{element.tag_name}' by selector '{selector}'",
+        str(e)
+      )
 
   def fill(self, selector: str, value: str) -> None:
-    strategy, locator = self._get_strategy_and_locator(selector)
+    element = self.get_element(selector)
 
-    WebDriverWait(self._driver, 10).until(
-      EC.presence_of_element_located((strategy, locator))
-    )
+    if not element:
+      return
 
-    self._driver.find_element(strategy, locator).send_keys(value)
+    self._logger.info(f"Filling the element '{element.tag_name}' by selector '{selector}' with value '{value}'")
+    try:
+      element.send_keys(value)
+    except Exception as e:
+      self._logger.exception(
+        f"Error when filling the element '{element.tag_name}' by selector '{selector}' with value '{value}'",
+        str(e)
+      )
 
-  def wait_to_be_visible(self, selector: str, time: int = 10) -> None:
+  def wait_to_be_visible(self, selector: str, time: int = 3) -> tuple[By, str]:
     strategy, locator = self._get_strategy_and_locator(selector)
 
     WebDriverWait(self._driver, time).until(
       EC.presence_of_element_located((strategy, locator))
     )
 
-  def select(self, selector: str, value: str) -> None:
-    strategy, locator = self._get_strategy_and_locator(selector)
+    return strategy, locator
 
-    element = self._driver.find_element(strategy, locator)
-    select = Select(element)
-    select.select_by_value(value)
+  def select(self, selector: str, value: str) -> None:
+    element = self.get_element(selector)
+
+    if not element:
+      return
+
+    self._logger.info(f"Selecting the element '{element.tag_name}' by selector '{selector}' with value '{value}'")
+
+    try:
+      select = Select(element)
+      select.select_by_value(value)
+    except Exception as e:
+      self._logger.exception(
+        f"Error when selecting the element '{element.tag_name}' by selector '{selector}' with value '{value}'",
+        str(e)
+      )
 
   def get_element(self, selector: str) -> WebElement:
-    strategy, locator = self._get_strategy_and_locator(selector)
+    self._logger.info(f"Getting Element by selector: '{selector}'")
 
-    return self._driver.find_element(strategy, locator)
+    try:
+      strategy, locator = self._get_strategy_and_locator(selector)
+      return self._driver.find_element(strategy, locator)
+    except Exception as e:
+      self._logger.exception(f"Element not found for selector '{selector}'", str(e))
+      return None
 
   def get_elements(self, selector: str) -> list[WebElement]:
-    strategy, locator = self._get_strategy_and_locator(selector)
+    self._logger.info(f"Getting Elements by selector: '{selector}'")
 
-    return self._driver.find_elements(strategy, locator)
+    try:
+      strategy, locator = self._get_strategy_and_locator(selector)
+      return self._driver.find_elements(strategy, locator)
+    except Exception as e:
+      self._logger.exception(f"Elements not found for selector '{selector}'", str(e))
+      return []
 
   def get_child_element(self, element: WebElement, selector: str) -> WebElement:
+    self._logger.info(f"Getting child element for element '{element.tag_name}' by selector '{selector}'")
     try:
       strategy, locator = self._get_strategy_and_locator(selector)
       return element.find_element(strategy, locator)
-    except Exception:
+    except Exception as e:
+      self._logger.info(
+        f"Error getting child element for element '{element.tag_name}' by selector '{selector}'",
+        str(e)
+      )
       return None
 
   def get_child_elements(self, element: WebElement, selector: str) -> list[WebElement]:
-    strategy, locator = self._get_strategy_and_locator(selector)
-
-    return element.find_elements(strategy, locator)
+    self._logger.info(f"Getting child elements for element '{element.tag_name}' by selector '{selector}'")
+    try:
+      strategy, locator = self._get_strategy_and_locator(selector)
+      return element.find_elements(strategy, locator)
+    except Exception as e:
+      self._logger.info(
+        f"Error getting child elements for element '{element.tag_name}' by selector '{selector}'",
+        str(e)
+      )
+      return []

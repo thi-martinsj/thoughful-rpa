@@ -1,10 +1,13 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import logging
 
 from RPA.HTTP import HTTP
 
 from src.domain.enums import APNewsCategory
 from src.domain.interfaces import Browser, NewsRepository
+
+logger = logging.getLogger(__name__)
 
 
 class APNewsRepository(NewsRepository):
@@ -12,17 +15,25 @@ class APNewsRepository(NewsRepository):
     self._browser = browser
 
   def fetch_news(self, phrase: str, category: str, number_months: int) -> list[dict]:
+    logger.info("[APNewsRepository] Fetching news")
+
     news_data = []
     self._browser.goto("https://apnews.com/")
     self._search_news(phrase)
     self._filter_news_by_category(category)
     self._extract_data_from_news(number_months, news_data)
     self._browser.close()
+
+    logger.info("[APNewsRepository] Fetched news")
     return news_data
 
   def download_image(self, url: str, filename: str) -> None:
+    logger.info(f"[APNewsRepository] Downloading image. URL: '{url}'")
+
     http = HTTP()
     http.download(url=url, overwrite=True, target_file=f"./output/news_picture/{filename}.jpg")
+
+    logger.info(f"[APNewsRepository] Successfully downloaded image. URL: '{url}'")
 
   def _search_news(self, phrase: str):
     self._browser.click(".SearchOverlay-search-button")
@@ -34,7 +45,7 @@ class APNewsRepository(NewsRepository):
 
     self._browser.select(".Select-input", "3")
 
-    self._browser.wait_to_be_visible(".SearchFilter-heading", 10)
+    self._browser.wait_to_be_visible(".SearchFilter-heading", 5)
 
     if category == APNewsCategory.LIVE_BLOGS.value:
       self._browser.click("input_value=00000190-0dc5-d7b0-a1fa-dde7ec030000")

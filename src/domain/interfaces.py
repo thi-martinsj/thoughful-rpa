@@ -3,6 +3,8 @@ from abc import ABC
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 
+from src.domain.entities import NewsData
+
 
 class Browser(ABC):
   def _set_webdriver(self) -> webdriver.Chrome:
@@ -44,4 +46,7 @@ class NewsRepository(ABC):
     raise NotImplementedError
 
   def download_image(self, url: str, filename: str) -> None:
+    raise NotImplementedError
+
+  def save_news_to_excel(self, news_list: list[NewsData], filename: str):
     raise NotImplementedError

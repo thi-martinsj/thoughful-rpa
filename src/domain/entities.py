@@ -12,6 +12,16 @@ class NewsData:
     self.count_search_phrase = None
     self.contains_money = False
 
+  def to_dict(self):
+    return {
+      "title": self.title,
+      "date": self.date,
+      "description": self.description,
+      "picture_filename": self.image_filename,
+      "count_of_search_frase": self.count_search_phrase,
+      "contains_money": self.contains_money
+    }
+
   @staticmethod
   def from_raw_data(raw_data: dict, phrase: str) -> "NewsData":
     news_data = NewsData()

@@ -1,11 +1,11 @@
 from robocorp.tasks import task
 
-from .infrastructure.chrome_browser import ChromeBrowser
+from .infrastructure.browsers.chrome_browser import ChromeBrowser
+from .infrastructure.repositories.ap_news_repository import APNewsRepository
 
 
 @task
 def minimal_task():
-    message = "Hello"
-    message = message + " World!"
-    browser = ChromeBrowser()
-    browser.goto("htpps://www.google.com.br")
+    ap_news_repo = APNewsRepository(ChromeBrowser())
+    ap_news_repo.fecth_news("test", "stories", 2)
+
